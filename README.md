@@ -20,7 +20,7 @@ The solution consists of the two main components:
 ```
 http://127.0.0.1:8000/app_dev.php/reviews
 ```
-* Csv files with sample data are available in 'sample_data' folder. Please note that topics and adjectives have unique constraint defined - adding topics / adjectives that are already defined will result in exception.
+* Csv files with sample data are available in 'sample_csv' folder. Please note that topics and adjectives have unique constraint defined - adding topics / adjectives that are already defined will result in exception.
 
 ##### Troubleshooting:
 * *PDOException: could not find driver* - make sure you have pdo drivers for sqlite installed on your system as they are not a part of the composer. To install them run:
