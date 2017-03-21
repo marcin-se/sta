@@ -112,7 +112,7 @@ The algorithm handles the following scenarios:
 There are however some scenarios in which the algorithm may give incorrect results. These include:
 
 * adjectives / topics not predefined by a user will be recognized by a pos tagger as 'other' which may produce incorrect dependencies. This can be fixed by defining more words or supplying pos tagger with a complete english dictionary
-* sentences using non-direct negations, for example: "I've seen many great hotels, but this is not one of them." would be classified as positive based on 'great hotel'. Another example: "Room was far from being clean" (clean room, +1)
+* sentences using non-direct negations, for example: "I've seen many great hotels, but this is not one of them." would be classified as positive based on 'great hotel'. Another example: "Room was anything but clean" (clean room, +1)
 * sentences with modals, for example: "With a little effort this could be a good hotel" (good hotel, +1)
 * positively defined adjectives used in a negative context, for example: "It was a big fail" (big +1) or negatively defined adjectives used in a positive context, i.e. "You are far enough away from traffic and noise" (far -1)
 * reviews containing irony / sarcasm
