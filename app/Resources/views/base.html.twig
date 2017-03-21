@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}Semantic Text Analysis{% endblock %}</title>
+        <link rel="stylesheet" href="{{ asset('css/main.css') }}" />
+        <link rel="stylesheet" href="{{ asset('css/vendor/bootstrap.min.css') }}"> 
+        <link rel="stylesheet" href="{{ asset('css/vendor/jsgrid.min.css') }}"> 
+        <link rel="stylesheet" href="{{ asset('css/vendor/jsgrid-theme.min.css') }}"> 
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse">
+            <div class="container">
+              <div class="navbar-header">
+                <a class="navbar-brand" href="#">Semantic Text Analysis</a>
+              </div>
+              <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                  <li id="navbar-reviews"><a href="reviews">Reviews</a></li>
+                  <li id="navbar-topics"><a href="topics">Topics</a></li>
+                  <li id="navbar-adjectives"><a href="adjectives">Adjectives</a></li>
+                </ul>
+              </div>
+            </div>
+        </nav>
+
+        <div class="container">
+          <div class="row">
+            <div class="pull-right">
+              {% block buttons_special %}{% endblock %}
+              <button type="button" class="btn btn-info" data-toggle="modal" data-target="#addModal">Add</button>
+              <button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal">Upload (csv)</button>
+              <button id="btn-delete-all" type="button" class="btn btn-danger">Delete All</button>
+            </div>
+          </div>
+          <div class="text-center">
+          {% block validation_msg %}{% endblock %}
+          </div>
+          <div class="row">
+            <div id="data-grid"></div>
+          </div>
+        </div><br>
+
+        <!-- CSV UPLOAD MODAL -->
+        <div id="uploadModal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Upload (csv)</h4>
+              </div>
+              <div class="modal-body">
+                <form action="" method="post" {{ form_enctype(uploadForm) }}>
+                  {% form_theme uploadForm 'form/bootstrap_3_layout.html.twig' %}
+                  {{ form_widget(uploadForm) }}
+                  <button type="submit" class="btn btn-info">Submit</button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADD ITEM MODAL -->
+        <div id="addModal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add</h4>
+              </div>
+              <div class="modal-body">
+                <form action="" method="post" {{ form_enctype(addForm) }}>
+                  {% form_theme addForm 'form/bootstrap_3_layout.html.twig' %}
+                  {{ form_widget(addForm) }}
+                  <button type="submit" class="btn btn-info">Submit</button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% block body %}{% endblock %}
+          
+        <script type="text/javascript" src="{{ asset('js/vendor/jquery.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('js/vendor/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('js/vendor/loadingoverlay.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('js/vendor/jsgrid.min.js') }}"></script>
+        <script>
+        function baseCall(event, type, url, data){
+          $.LoadingOverlay("show");
+          $.ajax({
+            type: type,
+            url: "/app_dev.php"+url,
+            data: data,
+          }).done(function() {
+            $("#data-grid").jsGrid("loadData");
+          }).fail(function(msg, error) {
+            console.log("request failed: ", error);
+          }).always(function(){
+            $.LoadingOverlay("hide");
+          });
+        }
+        </script>
+
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

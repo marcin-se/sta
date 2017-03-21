@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block validation_msg %}
+    {% form_theme addForm 'form/bootstrap_3_layout.html.twig' %}
+    {{ form_errors(addForm.name) }}
+{% endblock %}
+
+{% block javascripts %}
+<script>
+  $(document).ready(function(){ 
+    $("#navbar-adjectives").addClass("active");
+
+    $("#btn-delete-all").click(function(event) { baseCall(event, "DELETE", "/rest/adjectives") });
+
+    $("#data-grid").jsGrid({
+        width: "100%",
+        sorting: true,
+        paging: true,
+        editing: false,
+        confirmDeleting: false,
+        autoload: true,
+        pageSize: 10,
+        pageButtonCount: 5,
+        noDataContent: "No data",
+        controller: {
+            loadData: function() {
+                $.LoadingOverlay("show");
+                return $.ajax({
+                    type: "GET",
+                    url: "/app_dev.php/rest/adjectives",
+                }).always(function(){
+                    $.LoadingOverlay("hide");
+                });
+            },
+            deleteItem: function(item) {
+                $.LoadingOverlay("show");
+                return $.ajax({
+                    type: "DELETE",
+                    url: "/app_dev.php/rest/adjectives",
+                    data: item
+                }).always(function(){
+                    $.LoadingOverlay("hide");
+                });
+            },
+        },
+        fields: [
+          { name: "name", title: "Name", type: "text", width: 150 },
+          { name: "weight", title: "Weight", type: "text", width: 150 },
+          {
+            type: "control",
+            modeSwitchButton: false,
+            editButton: false,
+          }
+        ]
+    });
+  });
+
+</script>
+{% endblock %}

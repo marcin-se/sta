@@ -1,0 +1,27 @@
+# Learn more about services, parameters and containers at
+# http://symfony.com/doc/current/book/service_container.html
+parameters:
+#    parameter_name: value
+
+services:
+    topic_repository:
+      class: AppBundle\Repository\TopicRepository
+      factory: ["@doctrine.orm.entity_manager", "getRepository"]
+      arguments: ['AppBundle\Entity\Topic']
+
+    adjective_repository:
+      class: AppBundle\Repository\AdjectiveRepository
+      factory: ["@doctrine.orm.entity_manager", "getRepository"]
+      arguments: ['AppBundle\Entity\Adjective']
+
+    pos_tagger:
+      class: AppBundle\TextAnalysis\DefaultPosTagger
+      arguments: ["@topic_repository", "@adjective_repository"]
+
+    dependency_parser:
+      class: AppBundle\TextAnalysis\DefaultDependencyParser
+      arguments: []
+
+    text_analysis:
+        class: AppBundle\Services\TextAnalysisService
+        arguments: ["@topic_repository", "@adjective_repository", "@pos_tagger", "@dependency_parser"]

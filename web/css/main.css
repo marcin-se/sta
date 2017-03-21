@@ -1,0 +1,35 @@
+.row {
+	margin-bottom: 10px;
+}
+
+.review {
+	font-size: 12px;
+}
+
+.text-highlight {
+	font-size: 14px;
+}
+
+.jsgrid-grid-header,
+.jsgrid-grid-body{
+  overflow: auto !important;
+}
+
+.score {
+	font-size: 20px;
+	text-align: center;
+}
+
+.score-positive {
+	color: green;
+}
+
+.score-negative {
+	color: red;	
+}
+
+.analysis-result {
+	font-size: 12px;
+}
+
+.modal .modal-dialog { width: 1500px; }

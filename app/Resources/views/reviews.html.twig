@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+
+{% block buttons_special %}
+<button id="btn-calculate-scoring" type="button" class="btn btn-success">Analyse</button>
+<button id="btn-clear-scoring" type="button" class="btn btn-warning">Delete Results</button>
+{% endblock %}
+
+{% block body %}
+<!-- REVIEW ANALYSIS MODAL -->
+<div id="visModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+          <canvas id="visCanvas" width="1300" height="400"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+
+<script type="text/javascript" src="{{ asset('js/dependency-renderer.js') }}"></script>
+
+<script>
+
+  $(document).ready(function() {
+    $("#navbar-reviews").addClass("active");
+    
+    $("#btn-delete-all").click(function(event) { baseCall(event, "DELETE", "/rest/reviews") });
+    $("#btn-calculate-scoring").click(function(event) { baseCall(event, "GET", "/reviews/calculate") });
+    $("#btn-clear-scoring").click(function( event ) { baseCall(event, "GET", "/reviews/delete_analysis") });
+
+    $("#data-grid").jsGrid({
+        width: "100%",
+        selecting: false,
+        sorting: true,
+        paging: true,
+        pageSize: 10,
+        pageButtonCount: 5,
+        autoload: true,
+        noDataContent: "No data",
+        controller: {
+            loadData: function(params) {
+                $.LoadingOverlay("show");
+                return $.ajax({
+                    type: "GET",
+                    url: "/app_dev.php/rest/reviews",
+                    data: params
+                }).always(function(){
+                  $.LoadingOverlay("hide");
+                });
+            },
+        },
+        rowRenderer: function(item) {
+          var row = $("<tr>").addClass("jsgrid-row");
+          row.append(renderReviewCell(item));
+          row.append(renderAnalysisResultCell(item));
+          row.append(renderScoreCell(item));
+          row.append(renderOptionsCell(item));
+          return row;
+        },
+        fields: [
+            { name: "review", title: "Review", type: "text", width: 150 },
+            { name: "analysisResults", title: "Analysis Results", type: "text", width: 100  },
+            { name: "score", title: "Total Score", type: "number", width: 25  },
+            { name: "options", title: "Options", type: "text", width: 25  },
+        ]
+    });
+
+    function renderAnalysisResultCell(item){
+      var analysisResultCell = $("<td>").addClass("jsgrid-cell").css("width","100px");
+      for (var i = 0; i < item.analysisResults.length; i++) {
+        var s = item.analysisResults[i];
+        var pClass = s['score'] > 0 ? 'text-success' : 'text-danger';
+        var p = $("<p>").addClass(pClass).addClass('analysis-result');
+        var negationPrefix = s['isNegated'] ? " ! " : "";
+        p.append("adjective: " + negationPrefix + s['adjective']);
+        if (s['topic']) p.append(", topic: " + s['topic']);
+        p.append(", partial score: " + s['score']);
+        analysisResultCell.append(p);
+      }
+
+      return analysisResultCell;
+    }
+
+    function renderScoreCell(item){
+      var scoreCell = ($("<td>").addClass("jsgrid-cell"));
+      scoreCssClass = item.score >= 0 ? "score-positive" : "score-negative";  
+      scoreCell.addClass("score")
+               .addClass(scoreCssClass)
+               .css("width","25px")
+               .append(item.score);
+
+      return scoreCell;
+    }
+
+    function renderReviewCell(item){
+      var reviewCell = $("<td>").addClass("jsgrid-cell").addClass("review").css("width","150px");
+      reviewCell.append(item.review);
+     
+      return reviewCell;
+    }
+
+    function renderOptionsCell(item){
+      var optionsCell = ($("<td>").addClass("jsgrid-cell"));
+      var analyzeBtn = ($("<button>"));
+      analyzeBtn.attr("type", "button").addClass("btn").addClass("btn-info");
+      analyzeBtn.append("graph");
+      analyzeBtn.click(function( event ) { 
+        $.LoadingOverlay("show");
+        return $.ajax({
+            type: "POST",
+            url: "/app_dev.php/rest/analysis",
+            data: item
+        }).done(function(result){
+          showDependencies('visCanvas', item.review, result);
+          $('#visModal').modal('toggle');
+          $.LoadingOverlay("hide");
+        }).fail(function(error){
+          $.LoadingOverlay("hide");
+          console.log("request failed: ", error);
+        });
+      });
+
+      optionsCell.addClass("options").css("width","25px").append(analyzeBtn);
+
+      return optionsCell;
+    }
+  });
+</script>
+{% endblock %}

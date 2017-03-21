@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block validation_msg %}
+    {% form_theme addForm 'form/bootstrap_3_layout.html.twig' %}
+    {{ form_errors(addForm.name) }}
+{% endblock %}
+
+{% block javascripts %}
+  <script>
+    $(document).ready(function() {
+        $("#navbar-topics").addClass("active");
+
+        $("#btn-delete-all").click(function(event) { baseCall(event, "DELETE", "/rest/topics") });
+
+        $("#data-grid").jsGrid({
+            width: "100%",
+            editing: false,
+            sorting: true,
+            paging: true,
+            autoload: true,
+            confirmDeleting: false,
+            pageSize: 10,
+            pageButtonCount: 5,
+            noDataContent: "No data",
+            controller: {
+                loadData: function() {
+                    $.LoadingOverlay("show");
+                    return $.ajax({
+                        type: "GET",
+                        url: "/app_dev.php/rest/topics",
+                    }).always(function(){
+                        $.LoadingOverlay("hide");
+                    });
+                },
+                deleteItem: function(item) {
+                    $.LoadingOverlay("show");
+                    return $.ajax({
+                        type: "DELETE",
+                        url: "/app_dev.php/rest/topics",
+                        data: item
+                    }).always(function(){
+                        $.LoadingOverlay("hide");
+                    });
+                },
+            },
+            fields: [
+              { name: "name", title: "Name", type: "text", width: 150 },
+              {
+                type: "control",
+                modeSwitchButton: false,
+                editButton: false,
+              }
+            ]
+        });
+    });
+  </script>
+{% endblock %}
