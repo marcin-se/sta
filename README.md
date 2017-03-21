@@ -98,6 +98,9 @@ The design of the parser was heavily inspired by the Stanford’s dependency par
 * intervening material - words that are crossed over by a certain separators (comas in my case) are less likely to be related
 * valency of heads - used to recognize negations, which are typically placed before the negated subject
 
+#### Concept map
+![Text analysis diagram](images/diagram.png)
+
 ## Results
 The algorithm handles the following scenarios:
 
